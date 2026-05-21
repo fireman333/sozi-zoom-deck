@@ -43,11 +43,13 @@ frames:
       整張流程圖一覽。左邊 5 preset 餵 YAML，中間 Python 處理，右上輸出 HTML，右邊掛 runtime features，
       右下 PDF 是 optional 分支。每個區塊接下來會逐個 zoom。
 
-  # ----- Frame 3: 5 Presets cluster (left subgraph) -----
+  # ----- Frame 3: 5 Presets cluster (left subgraph, auto-cal by svg_id) -----
   - id: presets
     mode: image
     image: ./architecture.svg
-    view: [0, 50, 200, 510]
+    target:
+      svg_id: "my-svg-subGraph1"
+      padding: 10
     dim: 0
     overlay:
       position: right
@@ -63,11 +65,13 @@ frames:
       左側 subgraph：5 個 preset 是 skill 自帶 starter。實際 use case 多半 cp 一個 preset 改 FRAMES list。
       新 use case 出現 2 次以上才考慮抽新 preset，avoid premature preset proliferation。
 
-  # ----- Frame 4: YAML config node (input center-left) -----
+  # ----- Frame 4: YAML config node (auto-cal by svg_id) -----
   - id: yaml-input
     mode: image
     image: ./architecture.svg
-    view: [220, 240, 220, 280]
+    target:
+      svg_id: "my-svg-flowchart-Y-0"
+      padding: 14
     dim: 0
     overlay:
       position: caption-bottom
@@ -78,11 +82,13 @@ frames:
       overlay (full/right/caption-bottom...)、dim、notes。其他 input 是 image 檔跟 live URL，
       在 frame 內 reference。
 
-  # ----- Frame 5: build_deck.py interior (center cluster) -----
+  # ----- Frame 5: build_deck.py interior (center cluster, auto-cal) -----
   - id: generator
     mode: image
     image: ./architecture.svg
-    view: [440, 210, 460, 400]
+    target:
+      svg_id: "my-svg-build_deck.py"
+      padding: 10
     dim: 0
     overlay:
       position: right
@@ -98,11 +104,13 @@ frames:
       Template engine 是純字串替換（__N__、__IFRAME_W__、__DECK_JSON__），沒用 Jinja，
       cross-version 安全、debug 直觀。
 
-  # ----- Frame 6: self-contained HTML output -----
+  # ----- Frame 6: self-contained HTML output (auto-cal by svg_id) -----
   - id: html-output
     mode: image
     image: ./architecture.svg
-    view: [900, 290, 230, 130]
+    target:
+      svg_id: "my-svg-flowchart-H-6"
+      padding: 14
     dim: 0
     overlay:
       position: caption-bottom
@@ -112,11 +120,13 @@ frames:
       輸出純 HTML，雙擊即開、沒 dependency。Email、隨身碟、GitHub Pages、Notion embed 都行。
       Live iframe 需要網路，純 image / text deck 不需要。
 
-  # ----- Frame 7: Runtime features cluster (right subgraph) -----
+  # ----- Frame 7: Runtime features cluster (right subgraph, auto-cal) -----
   - id: runtime
     mode: image
     image: ./architecture.svg
-    view: [1185, 50, 250, 500]
+    target:
+      svg_id: "my-svg-subGraph2"
+      padding: 10
     dim: 0
     overlay:
       position: left
@@ -131,11 +141,13 @@ frames:
       4 個 runtime features 全部都是「presenting 時用到的」工具。Calibration 解決 view 座標難量
       的痛點；presenter mode 給講者用；outline + notes 給結構化長 deck 用。
 
-  # ----- Frame 8: PDF handout branch (bottom-right corner) -----
+  # ----- Frame 8: PDF handout branch (auto-cal by svg_id) -----
   - id: pdf-branch
     mode: image
     image: ./architecture.svg
-    view: [1200, 540, 220, 110]
+    target:
+      svg_id: "my-svg-flowchart-PDF-7"
+      padding: 14
     dim: 0
     overlay:
       position: caption-top
