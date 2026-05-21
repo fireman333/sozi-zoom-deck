@@ -1,151 +1,167 @@
-# sozi-zoom-deck · self-demo (meta — deck demonstrating the skill itself)
-# Generated for GitHub Pages landing.
+# sozi-zoom-deck — self-demo deck
+# Meta-demo: zoom-tour the architecture flowchart end-to-end
+# (this deck is itself built by the skill it demonstrates)
+#
+# All frames share ONE background image (the Mermaid architecture SVG)
+# and zoom into different stages along the data flow:
+#   Cover → Overview → 5 presets → YAML → build_deck.py → HTML → Runtime → PDF → Recap
 
 id: sozi-zoom-deck-demo
 title: "sozi-zoom-deck"
-subtitle: "Sozi-style zoom presentations from YAML"
-iframe_ref_w: 1600
-iframe_ref_h: 900
+subtitle: "Zoom-tour the architecture"
+iframe_ref_w: 1536
+iframe_ref_h: 646
 
 frames:
-  # 1 · Cover
+  # ----- Frame 1: Cover (full diagram dimmed, title overlay) -----
   - id: cover
-    mode: text
+    mode: image
+    image: ./architecture.svg
+    view: [0, 0, 1536, 646]
+    dim: 0.65
     overlay:
       position: full
       title: "sozi-zoom-deck"
-      subtitle: "Sozi-style zoom presentations from YAML"
-      tagline: "Self-contained HTML · camera pan + zoom · spotlight highlights · YAML config in, single-file out"
-      footer: "github.com/fireman333/sozi-zoom-deck · MIT · v1.0"
+      subtitle: "Sozi-style zoom decks from YAML"
+      tagline: "Camera pans + zooms across one canvas — text overlays float on top"
+      footer: "github.com/fireman333/sozi-zoom-deck · MIT · press → to start the tour"
     notes: |
-      Cover frame for the self-demo. This deck itself is built by sozi-zoom-deck.
+      Cover：全流程圖在背景（dim 65%）+ 中央 glass panel 大標。
+      接下來會沿流程圖 zoom 進每個階段：preset → YAML → generator → output → features → PDF。
 
-  # 2 · What it is
-  - id: what
-    mode: text
-    title_level: 1
-    overlay:
-      position: full
-      title: "What is this?"
-      subtitle: "Niche-filling tool · 2026"
-      bullets:
-        - "🎯 Sozi-style zoom decks — camera moves spatially over a continuous canvas"
-        - "📄 YAML config in, self-contained HTML out (no Inkscape / Sozi editor)"
-        - "🖼 Background can be: static image · live webpage (iframe) · plain text card"
-        - "🔆 Spotlight highlight boxes replace blurry CSS scale zoom"
-        - "🎨 Dark / light theme · PDF export with speaker notes"
-        - "🧰 In-deck calibration mode (drag to measure UI coords)"
-    notes: |
-      Why this exists: Sozi pioneered zoomable-canvas presentations in 2009, but had
-      no programmable / config-driven generator. This skill fills that gap.
-      Best for content where SPATIAL continuity matters more than slide-by-slide chunking.
-
-  # 3 · Architecture (Mermaid SVG)
-  - id: architecture
+  # ----- Frame 2: Overview (full diagram, no dim, caption only) -----
+  - id: overview
     mode: image
     image: ./architecture.svg
-    image_natural: [1600, 900]
-    view: [0, 0, 1600, 900]
+    view: [0, 0, 1536, 646]
+    dim: 0
+    overlay:
+      position: caption-top
+      title: "Pipeline 總覽"
+      subtitle: "5 presets · YAML config · Python generator · self-contained HTML · 4 runtime features"
+    notes: |
+      整張流程圖一覽。左邊 5 preset 餵 YAML，中間 Python 處理，右上輸出 HTML，右邊掛 runtime features，
+      右下 PDF 是 optional 分支。每個區塊接下來會逐個 zoom。
+
+  # ----- Frame 3: 5 Presets cluster (left subgraph) -----
+  - id: presets
+    mode: image
+    image: ./architecture.svg
+    view: [0, 50, 200, 510]
+    dim: 0
+    overlay:
+      position: right
+      title: "5 個 preset 起頭"
+      subtitle: "Cp 一份、改 frames → done"
+      bullets:
+        - "anatomy · 解剖圖 zoom 標註"
+        - "project-intro · vibe-coding live demo"
+        - "timeline · 水平 pan 時間線"
+        - "state-machine · HSM / decision tree"
+        - "generic · 空殼起頭"
+    notes: |
+      左側 subgraph：5 個 preset 是 skill 自帶 starter。實際 use case 多半 cp 一個 preset 改 FRAMES list。
+      新 use case 出現 2 次以上才考慮抽新 preset，avoid premature preset proliferation。
+
+  # ----- Frame 4: YAML config node (input center-left) -----
+  - id: yaml-input
+    mode: image
+    image: ./architecture.svg
+    view: [220, 240, 220, 280]
     dim: 0
     overlay:
       position: caption-bottom
-      title: "Architecture"
-      subtitle: "YAML → build_deck.py → HTML · 5 presets · runtime features"
+      title: "YAML config — 你的 deck spec"
+      subtitle: "id · title · iframe_ref_w/h · pages · frames[{view, mode, overlay, notes, ...}]"
     notes: |
-      The whole pipeline at a glance.
-      Inputs (YAML / images / URLs) → generator (parse + embed + render)
-      → outputs (HTML, optional PDF) → runtime features (cal mode / presenter / list / notes).
-      The 5 presets are config templates targeting different content shapes.
+      YAML 是唯一 input。每個 frame 一個 dict：mode (text/iframe/image)、view (x,y,w,h)、
+      overlay (full/right/caption-bottom...)、dim、notes。其他 input 是 image 檔跟 live URL，
+      在 frame 內 reference。
 
-  # 4 · 5 Presets
-  - id: presets
-    mode: text
-    title_level: 1
+  # ----- Frame 5: build_deck.py interior (center cluster) -----
+  - id: generator
+    mode: image
+    image: ./architecture.svg
+    view: [440, 210, 460, 400]
+    dim: 0
+    overlay:
+      position: right
+      title: "build_deck.py — Python generator"
+      subtitle: "≈ 180 行純 stdlib + PyYAML"
+      bullets:
+        - "Parse YAML + validate per-frame schema"
+        - "Embed images as base64 data URIs (no external refs)"
+        - "Inline render the HTML template (CSS + JS)"
+        - "Optional PDF export via chrome headless"
+    notes: |
+      Generator 邏輯極簡：把 YAML resolve image path、base64 embed、塞進 HTML template、寫檔。
+      Template engine 是純字串替換（__N__、__IFRAME_W__、__DECK_JSON__），沒用 Jinja，
+      cross-version 安全、debug 直觀。
+
+  # ----- Frame 6: self-contained HTML output -----
+  - id: html-output
+    mode: image
+    image: ./architecture.svg
+    view: [900, 290, 230, 130]
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Self-contained HTML — 20–300 KB · 100% portable"
+      subtitle: "Image base64 內嵌 / CSS+JS 全 inline / 開檔即用 · 無外部依賴"
+    notes: |
+      輸出純 HTML，雙擊即開、沒 dependency。Email、隨身碟、GitHub Pages、Notion embed 都行。
+      Live iframe 需要網路，純 image / text deck 不需要。
+
+  # ----- Frame 7: Runtime features cluster (right subgraph) -----
+  - id: runtime
+    mode: image
+    image: ./architecture.svg
+    view: [1185, 50, 250, 500]
+    dim: 0
+    overlay:
+      position: left
+      title: "4 個 runtime features"
+      subtitle: "Built into output HTML · keyboard-only"
+      bullets:
+        - "C · Calibration mode — drag-measure UI 區，自動存 localStorage"
+        - "P · Presenter mode — prev/cur/next strip + clock + 自動 notes"
+        - "L · Frame list — outline hierarchy (title_level 1-4)"
+        - "N · Speaker notes — per-frame markdown"
+    notes: |
+      4 個 runtime features 全部都是「presenting 時用到的」工具。Calibration 解決 view 座標難量
+      的痛點；presenter mode 給講者用；outline + notes 給結構化長 deck 用。
+
+  # ----- Frame 8: PDF handout branch (bottom-right corner) -----
+  - id: pdf-branch
+    mode: image
+    image: ./architecture.svg
+    view: [1200, 540, 220, 110]
+    dim: 0
+    overlay:
+      position: caption-top
+      title: "--pdf · 可選 handout"
+      subtitle: "Chrome headless 印靜態 PDF · 含 speaker notes · 適合會議發放"
+    notes: |
+      `python3 build_deck.py my-deck.yaml --pdf` 同時輸出 .html + .pdf。
+      PDF 是把所有 frame + notes 攤平成靜態頁，給聽眾帶回去看。
+
+  # ----- Frame 9: Recap (back to full) -----
+  - id: recap
+    mode: image
+    image: ./architecture.svg
+    view: [0, 0, 1536, 646]
+    dim: 0.45
     overlay:
       position: full
-      title: "5 Presets"
-      subtitle: "Templates for different content shapes"
+      title: "Recap"
+      subtitle: "從 YAML 到 self-contained HTML · 一個 generator · 5 preset · 4 runtime feature"
       bullets:
-        - "🫀 anatomy — diagrams, surgical landmarks, X-ray annotations"
-        - "💻 project-intro — vibe-coding live demo, web app walkthrough"
-        - "📅 timeline — milestones, disease progression, life history (horizontal pan)"
-        - "🔀 state-machine — HSM, decision tree, clinical algorithm, UI flow"
-        - "📝 generic — empty template for any new use case"
+        - "適合：anatomy zoom 標註 · live web demo · 時間線 · state machine · 整圖深度標註"
+        - "不適合：14+ frame 長 deck（觀眾迷失空間方位）· 登入後才有內容的 web app"
+        - "Sister skill：anthropic-skills:pptx（一般 slide deck）"
+        - "License: MIT · Contributions welcome"
+      footer: "github.com/fireman333/sozi-zoom-deck"
     notes: |
-      Pick a preset close to your content, cp into your project, edit YAML, build.
-      Each preset comes with a worked example + view coord defaults + speaker notes templates.
-
-  # 5 · Calibration mode (killer feature)
-  - id: calibration
-    mode: text
-    title_level: 1
-    overlay:
-      position: full
-      title: "Calibration Mode (C key)"
-      subtitle: "Drag-measure UI regions · auto-save coords"
-      bullets:
-        - "1. Press C — banner appears, cursor becomes crosshair"
-        - "2. Drag a rectangle over the UI element you want to highlight"
-        - "3. Coords auto-saved to localStorage + copied to clipboard"
-        - "4. Highlight box instantly applies new coords (live preview)"
-        - "5. Press S to export all calibrations as paste-ready YAML"
-        - "6. Paste into config, rebuild, ship"
-    notes: |
-      Eye-balling pixel coords from screenshots is error-prone.
-      Calibration mode lets you drag-measure directly on the deck — see results live.
-      localStorage persistence means your work survives reloads + rebuilds.
-
-  # 6 · Presenter mode
-  - id: presenter
-    mode: text
-    title_level: 1
-    overlay:
-      position: full
-      title: "Presenter Mode (P key)"
-      subtitle: "For when you're actually giving the talk"
-      bullets:
-        - "⏰ Wall clock + elapsed timer in top-right"
-        - "👁 Prev / current / next frame strip at bottom"
-        - "📝 Speaker notes auto-pinned open"
-        - "🎯 Counter pill highlighted for visibility"
-        - "Press P again to exit"
-    notes: |
-      Inspired by INF554/a5-tripley 3-panel presenter pattern.
-      Simplified: instead of multiple iframe instances (heavy), we show frame titles
-      in a slim bottom strip — lighter, just as useful for the presenter.
-
-  # 7 · Quick start
-  - id: quick-start
-    mode: text
-    title_level: 1
-    overlay:
-      position: full
-      title: "Quick Start"
-      subtitle: "5 minutes to your first deck"
-      bullets:
-        - "$ cp ~/.claude/skills/sozi-zoom-deck/presets/anatomy.yaml my-deck.yaml"
-        - "$ # edit my-deck.yaml — change image, frames, notes"
-        - "$ python3 build_deck.py my-deck.yaml -o my-deck.html"
-        - "$ open my-deck.html · press C to calibrate · press P for presenter mode"
-        - "$ python3 build_deck.py my-deck.yaml --pdf  # PDF handout"
-    notes: |
-      Requires Python 3.9+ + PyYAML. That's it. No build chain, no dependencies.
-      Inside Claude Code: just say "build me a sozi zoom deck" and the skill triggers.
-
-  # 8 · CTA
-  - id: cta
-    mode: text
-    overlay:
-      position: full
-      title: "Try it"
-      subtitle: "MIT · zero runtime dependencies · ships as ~7 files"
-      bullets:
-        - "📦 github.com/fireman333/sozi-zoom-deck"
-        - "📖 Read the README (中英雙語)"
-        - "🍴 Fork & make your own preset"
-        - "🐛 File issues for missing features"
-        - "💬 PRs welcome — see Contributing section"
-      footer: "Built with sozi-zoom-deck itself · meta enough yet?"
-    notes: |
-      Closing thought: this whole demo deck is generated by the same skill it demonstrates.
-      The YAML for this deck is at docs/demo.yaml in the repo — peek at it as a starting template.
+      Recap：把所有 frame 走過的 stage 用一句話總結。
+      Sister skill 退讓給 pptx（一般 slide）跟 case-discussion-pptx（臨床 case）。
+      把 repo URL 留在最後給聽眾。
