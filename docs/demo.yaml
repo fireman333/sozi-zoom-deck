@@ -1,0 +1,151 @@
+# sozi-zoom-deck · self-demo (meta — deck demonstrating the skill itself)
+# Generated for GitHub Pages landing.
+
+id: sozi-zoom-deck-demo
+title: "sozi-zoom-deck"
+subtitle: "Sozi-style zoom presentations from YAML"
+iframe_ref_w: 1600
+iframe_ref_h: 900
+
+frames:
+  # 1 · Cover
+  - id: cover
+    mode: text
+    overlay:
+      position: full
+      title: "sozi-zoom-deck"
+      subtitle: "Sozi-style zoom presentations from YAML"
+      tagline: "Self-contained HTML · camera pan + zoom · spotlight highlights · YAML config in, single-file out"
+      footer: "github.com/fireman333/sozi-zoom-deck · MIT · v1.0"
+    notes: |
+      Cover frame for the self-demo. This deck itself is built by sozi-zoom-deck.
+
+  # 2 · What it is
+  - id: what
+    mode: text
+    title_level: 1
+    overlay:
+      position: full
+      title: "What is this?"
+      subtitle: "Niche-filling tool · 2026"
+      bullets:
+        - "🎯 Sozi-style zoom decks — camera moves spatially over a continuous canvas"
+        - "📄 YAML config in, self-contained HTML out (no Inkscape / Sozi editor)"
+        - "🖼 Background can be: static image · live webpage (iframe) · plain text card"
+        - "🔆 Spotlight highlight boxes replace blurry CSS scale zoom"
+        - "🎨 Dark / light theme · PDF export with speaker notes"
+        - "🧰 In-deck calibration mode (drag to measure UI coords)"
+    notes: |
+      Why this exists: Sozi pioneered zoomable-canvas presentations in 2009, but had
+      no programmable / config-driven generator. This skill fills that gap.
+      Best for content where SPATIAL continuity matters more than slide-by-slide chunking.
+
+  # 3 · Architecture (Mermaid SVG)
+  - id: architecture
+    mode: image
+    image: ./architecture.svg
+    image_natural: [1600, 900]
+    view: [0, 0, 1600, 900]
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Architecture"
+      subtitle: "YAML → build_deck.py → HTML · 5 presets · runtime features"
+    notes: |
+      The whole pipeline at a glance.
+      Inputs (YAML / images / URLs) → generator (parse + embed + render)
+      → outputs (HTML, optional PDF) → runtime features (cal mode / presenter / list / notes).
+      The 5 presets are config templates targeting different content shapes.
+
+  # 4 · 5 Presets
+  - id: presets
+    mode: text
+    title_level: 1
+    overlay:
+      position: full
+      title: "5 Presets"
+      subtitle: "Templates for different content shapes"
+      bullets:
+        - "🫀 anatomy — diagrams, surgical landmarks, X-ray annotations"
+        - "💻 project-intro — vibe-coding live demo, web app walkthrough"
+        - "📅 timeline — milestones, disease progression, life history (horizontal pan)"
+        - "🔀 state-machine — HSM, decision tree, clinical algorithm, UI flow"
+        - "📝 generic — empty template for any new use case"
+    notes: |
+      Pick a preset close to your content, cp into your project, edit YAML, build.
+      Each preset comes with a worked example + view coord defaults + speaker notes templates.
+
+  # 5 · Calibration mode (killer feature)
+  - id: calibration
+    mode: text
+    title_level: 1
+    overlay:
+      position: full
+      title: "Calibration Mode (C key)"
+      subtitle: "Drag-measure UI regions · auto-save coords"
+      bullets:
+        - "1. Press C — banner appears, cursor becomes crosshair"
+        - "2. Drag a rectangle over the UI element you want to highlight"
+        - "3. Coords auto-saved to localStorage + copied to clipboard"
+        - "4. Highlight box instantly applies new coords (live preview)"
+        - "5. Press S to export all calibrations as paste-ready YAML"
+        - "6. Paste into config, rebuild, ship"
+    notes: |
+      Eye-balling pixel coords from screenshots is error-prone.
+      Calibration mode lets you drag-measure directly on the deck — see results live.
+      localStorage persistence means your work survives reloads + rebuilds.
+
+  # 6 · Presenter mode
+  - id: presenter
+    mode: text
+    title_level: 1
+    overlay:
+      position: full
+      title: "Presenter Mode (P key)"
+      subtitle: "For when you're actually giving the talk"
+      bullets:
+        - "⏰ Wall clock + elapsed timer in top-right"
+        - "👁 Prev / current / next frame strip at bottom"
+        - "📝 Speaker notes auto-pinned open"
+        - "🎯 Counter pill highlighted for visibility"
+        - "Press P again to exit"
+    notes: |
+      Inspired by INF554/a5-tripley 3-panel presenter pattern.
+      Simplified: instead of multiple iframe instances (heavy), we show frame titles
+      in a slim bottom strip — lighter, just as useful for the presenter.
+
+  # 7 · Quick start
+  - id: quick-start
+    mode: text
+    title_level: 1
+    overlay:
+      position: full
+      title: "Quick Start"
+      subtitle: "5 minutes to your first deck"
+      bullets:
+        - "$ cp ~/.claude/skills/sozi-zoom-deck/presets/anatomy.yaml my-deck.yaml"
+        - "$ # edit my-deck.yaml — change image, frames, notes"
+        - "$ python3 build_deck.py my-deck.yaml -o my-deck.html"
+        - "$ open my-deck.html · press C to calibrate · press P for presenter mode"
+        - "$ python3 build_deck.py my-deck.yaml --pdf  # PDF handout"
+    notes: |
+      Requires Python 3.9+ + PyYAML. That's it. No build chain, no dependencies.
+      Inside Claude Code: just say "build me a sozi zoom deck" and the skill triggers.
+
+  # 8 · CTA
+  - id: cta
+    mode: text
+    overlay:
+      position: full
+      title: "Try it"
+      subtitle: "MIT · zero runtime dependencies · ships as ~7 files"
+      bullets:
+        - "📦 github.com/fireman333/sozi-zoom-deck"
+        - "📖 Read the README (中英雙語)"
+        - "🍴 Fork & make your own preset"
+        - "🐛 File issues for missing features"
+        - "💬 PRs welcome — see Contributing section"
+      footer: "Built with sozi-zoom-deck itself · meta enough yet?"
+    notes: |
+      Closing thought: this whole demo deck is generated by the same skill it demonstrates.
+      The YAML for this deck is at docs/demo.yaml in the repo — peek at it as a starting template.

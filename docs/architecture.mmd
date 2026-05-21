@@ -1,0 +1,56 @@
+%%{init: {'theme':'dark', 'themeVariables': {'fontSize':'15px', 'primaryColor':'#1f2937', 'primaryTextColor':'#e6edf3', 'primaryBorderColor':'#58a6ff', 'lineColor':'#79c0ff', 'secondaryColor':'#374151', 'tertiaryColor':'#111827'}}}%%
+flowchart LR
+    classDef input fill:#0d4a6e,stroke:#58a6ff,color:#fff
+    classDef gen fill:#1f3a5f,stroke:#79c0ff,color:#fff
+    classDef out fill:#1a5e3a,stroke:#7ee787,color:#fff
+    classDef feat fill:#5f3a1f,stroke:#ffa657,color:#fff
+    classDef preset fill:#3a1f5f,stroke:#d2a8ff,color:#fff
+
+    Y["YAML config<br/>(my-deck.yaml)"]:::input
+    I["Images / SVG<br/>(base64 embed)"]:::input
+    U["Live URLs<br/>(iframe pre-load)"]:::input
+
+    subgraph "build_deck.py"
+        P["parse + validate"]:::gen
+        E["embed images<br/>(base64 data URI)"]:::gen
+        R["render template<br/>(CSS + JS inline)"]:::gen
+    end
+
+    H["self-contained HTML<br/>(20–300 KB)"]:::out
+    PDF["PDF handout<br/>(speaker notes)"]:::out
+
+    Y --> P
+    I --> E
+    U --> P
+    P --> R
+    E --> R
+    R --> H
+    H -.->|--pdf| PDF
+
+    subgraph "5 presets"
+        direction TB
+        A["anatomy"]:::preset
+        PI["project-intro"]:::preset
+        T["timeline"]:::preset
+        SM["state-machine"]:::preset
+        G["generic"]:::preset
+    end
+
+    subgraph "Runtime features"
+        direction TB
+        C["C · calibration mode<br/>(drag → coords)"]:::feat
+        PM["P · presenter mode<br/>(strip + clock + notes)"]:::feat
+        L["L · frame list<br/>(outline hierarchy)"]:::feat
+        N["N · speaker notes<br/>(per frame)"]:::feat
+    end
+
+    A --> Y
+    PI --> Y
+    T --> Y
+    SM --> Y
+    G --> Y
+
+    H --> C
+    H --> PM
+    H --> L
+    H --> N
