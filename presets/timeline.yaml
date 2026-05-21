@@ -1,0 +1,130 @@
+# sozi-zoom-deck · timeline preset
+# Horizontal-pan along a wide timeline image (chronological milestones).
+# Inspired by OlivierChirouze/zef-presentation — Mermaid timeline.mmd → SVG → Sozi pan.
+#
+# Pattern:
+#   - Single wide timeline image (e.g., 4000 × 800 px) as background
+#   - Frame 1: full timeline overview (zoomed out)
+#   - Frame 2-N: pan + zoom to each milestone region (left → right)
+#   - Final frame: zoom back to overview
+#
+# How to make the timeline image:
+#   (A) Mermaid → SVG: write timeline.mmd, render with mmdc or excalidraw
+#   (B) Inkscape → SVG: hand-draw a horizontal timeline
+#   (C) PowerPoint → export wide slide as PNG/PDF
+#   (D) Python matplotlib horizontal bar with text labels
+#
+# View coords are in IMAGE NATURAL pixels — adjust iframe_ref_w/h to match your image.
+#
+# Tip: open the deck → press C → use calibration mode to drag-measure each milestone region.
+
+id: timeline-example
+title: "Project Milestones"
+subtitle: "從零到 launch 的時間線"
+iframe_ref_w: 4000   # natural width of your timeline image (wide)
+iframe_ref_h: 800    # natural height
+
+frames:
+  # --- Frame 1: full timeline overview ---
+  - id: overview
+    mode: image
+    image: ./assets/your-timeline-image.png   # replace with your image
+    view: [0, 0, 4000, 800]   # full timeline visible at once
+    dim: 0.55
+    overlay:
+      position: full
+      title: "Project Timeline"
+      subtitle: "從零到 launch 的關鍵節點"
+      tagline: "press → 開始走訪每個 milestone"
+      footer: "→ next milestone · L jump · C calibrate"
+    notes: |
+      Cover：全 timeline 一覽，dim 一半讓背景成為 context。
+      讓觀眾先看到全貌（多少階段、整體弧線），再 zoom 進每個節點。
+
+  # --- Frame 2: Milestone 1 (left section) ---
+  - id: milestone-1
+    mode: image
+    image: ./assets/your-timeline-image.png
+    view: [0, 0, 1000, 800]   # left 1/4 of timeline
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Milestone 1 — Kickoff"
+      subtitle: "2024 Q1 · 第一個原型"
+    notes: |
+      Zoom 到 timeline 最左 1/4，看第一個里程碑的細節。
+      Caption 列日期 + 關鍵成果。
+      Speaker notes 補充 backstory：怎麼決定起點、團隊、預算等。
+
+  # --- Frame 3: Milestone 2 ---
+  - id: milestone-2
+    mode: image
+    image: ./assets/your-timeline-image.png
+    view: [1000, 0, 1000, 800]   # 2nd quarter
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Milestone 2 — MVP"
+      subtitle: "2024 Q3 · 第一版上線"
+    notes: |
+      第二里程碑。Pan 而非 jump — camera 順著走過去。
+
+  # --- Frame 4: Milestone 3 ---
+  - id: milestone-3
+    mode: image
+    image: ./assets/your-timeline-image.png
+    view: [2000, 0, 1000, 800]   # 3rd quarter
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Milestone 3 — Pivot"
+      subtitle: "2025 Q1 · 重大方向調整"
+    notes: |
+      可以在這裡用 right panel 介紹細節（換 overlay.position: right）。
+
+  # --- Frame 5: Milestone 4 (right section) ---
+  - id: milestone-4
+    mode: image
+    image: ./assets/your-timeline-image.png
+    view: [3000, 0, 1000, 800]   # right 1/4
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Milestone 4 — Launch"
+      subtitle: "2025 Q4 · 正式發布"
+    notes: |
+      最右一個里程碑。
+
+  # --- Frame 6: Recap overview ---
+  - id: recap
+    mode: image
+    image: ./assets/your-timeline-image.png
+    view: [0, 0, 4000, 800]   # back to full
+    dim: 0.5
+    overlay:
+      position: full
+      title: "回顧"
+      subtitle: "從 Kickoff 到 Launch · 18 個月"
+      bullets:
+        - "Kickoff 2024 Q1 — 第一個原型 + 種子團隊"
+        - "MVP 2024 Q3 — 第一版上線、100 個 user"
+        - "Pivot 2025 Q1 — 商業模式 / target audience 大調整"
+        - "Launch 2025 Q4 — 公開發布 + 5k user · 完成"
+      footer: "謝謝聆聽 · github.com/you/project"
+    notes: |
+      Recap zoom-out 重新看全 timeline，搭配 bullets 列每個里程碑一行 takeaway。
+      結尾 footer 放 contact / repo。
+
+# ============================================================
+# Alternative pattern: vertical timeline
+# ============================================================
+# 如果偏好垂直 timeline（例：醫學時間線、病程進展、人生大事），把 image 改成 tall
+# (e.g., 800 × 4000) 並讓 view 沿 y 軸 pan：
+#
+#   view: [0, 0, 800, 1000]   # top section
+#   view: [0, 1000, 800, 1000] # 2nd
+#   view: [0, 2000, 800, 1000] # 3rd
+#   view: [0, 3000, 800, 1000] # bottom
+#
+# 注意：本 skill 的 highlight box 跟 pan 都會自動處理 y 方向，
+# 但若你用 mode=iframe，記得把 iframe_ref_h 調大以容納整個垂直 timeline。

@@ -1,0 +1,102 @@
+# sozi-zoom-deck · project-intro preset
+# Vibe-coding project / live web demo with iframe background + highlight annotations.
+# Replace LIVE_URL and view coords for your own project.
+
+id: project-intro-example
+title: "My Project"
+subtitle: "Vibe-coding project intro"
+iframe_ref_w: 1440   # natural viewport width assumption for view coords
+iframe_ref_h: 1600   # iframe rendered height (enough for above-fold + some scroll)
+
+# Multiple URLs the deck can switch between (frame.page references these keys)
+pages:
+  home: "https://example.com/"
+  feature1: "https://example.com/#/feature1"
+  feature2: "https://example.com/#/feature2"
+
+frames:
+  - id: cover
+    mode: iframe
+    page: home
+    view: [0, 0, 1440, 1600]   # full view (no highlight)
+    dim: 0.7
+    overlay:
+      position: full
+      title: "My Project"
+      subtitle: "One-liner pitch"
+      tagline: "What this project does and why it matters"
+      footer: "github.com/you/repo · LICENSE"
+    notes: |
+      Cover frame：live homepage 當背景（dim 70%），標題置中。
+
+  - id: what-it-is-not
+    mode: iframe
+    page: home
+    view: [0, 0, 1440, 1600]
+    dim: 0.75
+    overlay:
+      position: full
+      title: "這 *不* 是什麼"
+      subtitle: "先排除誤會"
+      bullets:
+        - "❌ 不是 X — 不在 grindy"
+        - "❌ 不是 Y app — pattern 不同"
+        - "❌ 沒有 IAP / 付費"
+    notes: |
+      Anti-pattern 先排除聽眾的 mental model misalignment。
+
+  - id: nav-highlight
+    mode: iframe
+    page: home
+    view: [680, 18, 575, 50]   # tight box around nav bar (use cal mode C to measure!)
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "主要 nav"
+      subtitle: "6 大頁面 / 功能入口"
+    notes: |
+      Highlight 框出 nav bar。使用者按 C 進 calibration mode 自己量座標。
+
+  - id: feature-live
+    mode: iframe
+    page: feature1
+    view: [0, 0, 1440, 1600]   # full feature page
+    dim: 0.15
+    overlay:
+      position: right
+      title: "Feature 1 — Live"
+      subtitle: "什麼是 X、為什麼存在"
+      bullets:
+        - "重點 1"
+        - "重點 2"
+        - "重點 3"
+    notes: |
+      切到 /feature1 頁面，右側 panel 列重點，左側 iframe 露出可看。
+
+  - id: feature-detail
+    mode: iframe
+    page: feature1
+    view: [200, 95, 1035, 95]   # tight box around tutorial banner / specific element
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "細節 — 三件套"
+      subtitle: "Mechanism A / B / C"
+    notes: |
+      Zoom 進 feature 頁的關鍵元素。座標用 cal mode 量。
+
+  - id: cta
+    mode: iframe
+    page: home
+    view: [0, 0, 1440, 1600]
+    dim: 0.65
+    overlay:
+      position: full
+      title: "Try it"
+      subtitle: "What to do next"
+      bullets:
+        - "Step 1"
+        - "Step 2"
+        - "GitHub: github.com/you/repo"
+    notes: |
+      CTA / Roadmap。

@@ -1,0 +1,178 @@
+# sozi-zoom-deck · state-machine preset
+# HSM (Hierarchical State Machine) / decision tree / flowchart zoom presentation.
+# Inspired by aleph2c/miros docs/_static/concurrency1.sozi.html.
+#
+# Why this is different from anatomy.yaml:
+#   - anatomy = single static illustration with anatomical structures
+#   - state-machine = LOGICAL graph: nodes (states) + edges (transitions) + guard conditions
+#   - 強調「順著決策邏輯 zoom 巡走」而非「解剖位置 zoom 進細節」
+#
+# Typical content:
+#   - HSM diagram (states, super-states, transitions, history pseudostates)
+#   - Decision tree (DDx algorithm, treatment selection)
+#   - Clinical flowchart (NCCN-style decision branch)
+#   - Software state diagram (UI flow, auth flow, payment flow)
+#   - Game state diagram
+#
+# How to make the diagram image:
+#   (A) Inkscape：用 box + arrow 手繪 state machine、export SVG/PNG
+#   (B) PlantUML：state diagram syntax → render SVG (`plantuml -tsvg state.puml`)
+#   (C) Mermaid：stateDiagram / flowchart 語法 → mmdc render
+#   (D) Graphviz：dot 語法 → render PNG/SVG
+#   (E) draw.io / excalidraw：拖拉式
+#
+# Pattern：
+#   - Frame 1: full diagram overview（zoomed out）
+#   - Frame 2-N: zoom 進每個 state / decision node，speaker notes 帶 guard conditions、edge semantics
+#   - Final frame: 回到 overview 加 recap bullets
+#
+# Tip: 開 deck 後按 C 進 cal mode，拖拉框出每個 state node → 自動存 view 座標。
+
+id: state-machine-example
+title: "Login Flow State Machine"
+subtitle: "登入流程 HSM · 5 states + auth retry loop"
+iframe_ref_w: 1200    # natural width of your state-diagram image
+iframe_ref_h: 800     # natural height
+
+frames:
+  # --- Frame 1: 全圖 overview ---
+  - id: overview
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg   # replace with your diagram
+    view: [0, 0, 1200, 800]
+    dim: 0.55
+    overlay:
+      position: full
+      title: "Login Flow"
+      subtitle: "5 states · 2 終態 · retry loop"
+      tagline: "從 Initial 到 Authenticated / Locked 的所有路徑"
+      footer: "→ 開始巡走每個 state · L 列所有 frame · C 校正座標"
+    notes: |
+      Cover：全圖 overview，dim 一半。
+      讓觀眾先看整體結構（多少 state、終態在哪、是否有 retry/back edge），
+      再 zoom 進每個 state 細節。
+
+  # --- Frame 2: Initial state ---
+  - id: state-initial
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [80, 60, 200, 160]   # 左上 Initial state region
+    dim: 0
+    overlay:
+      position: right
+      title: "State: Initial"
+      subtitle: "進入點 · 等待 user trigger"
+      bullets:
+        - "Entry action: clear session, reset error count"
+        - "Exit guard: user clicks Login button"
+        - "→ transitions to: AwaitingCredentials"
+    notes: |
+      Initial state 是 entry pseudostate。沒有 internal action（純 wait）。
+      Transition trigger 是 UI event (Login button click)。
+      Speaker notes 可帶 implementation detail：例如哪個 React component 觸發 dispatch。
+
+  # --- Frame 3: AwaitingCredentials state ---
+  - id: state-awaiting
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [320, 60, 240, 160]   # 中上
+    dim: 0
+    overlay:
+      position: right
+      title: "State: AwaitingCredentials"
+      subtitle: "顯示 login form · 等 submit"
+      bullets:
+        - "Entry: render <LoginForm />"
+        - "On submit: → Authenticating"
+        - "On cancel: → Initial"
+    notes: |
+      此 state 純 UI render。要 highlight transitions out。
+
+  # --- Frame 4: Authenticating state ---
+  - id: state-authenticating
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [600, 60, 240, 160]   # 右上
+    dim: 0
+    overlay:
+      position: right
+      title: "State: Authenticating"
+      subtitle: "Call API · wait for response"
+      bullets:
+        - "Side effect: POST /auth/login"
+        - "On success → Authenticated (終態)"
+        - "On 401 + count < 3 → AwaitingCredentials (retry)"
+        - "On 401 + count ≥ 3 → Locked (終態)"
+    notes: |
+      此 state 含 side effect（API call）+ 多分支 transition + guard condition。
+      強調 retry loop 跟 lockout 觸發條件。
+
+  # --- Frame 5: Retry guard zoom-in ---
+  - id: retry-guard
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [400, 280, 440, 180]   # 中下，retry edge 跟 guard label
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Retry guard · count < 3"
+      subtitle: "失敗 retry 條件 · 達 3 次跳 Locked 終態"
+    notes: |
+      Zoom 進 transition edge 跟 guard condition label。
+      Common implementation pitfall：retry count reset point（成功後要 reset，否則下次登入帶舊計數）。
+
+  # --- Frame 6: Final states ---
+  - id: final-states
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [820, 280, 280, 320]   # 右下 終態 + Locked
+    dim: 0
+    overlay:
+      position: right
+      title: "終態 · Authenticated / Locked"
+      subtitle: "兩個 absorbing states"
+      bullets:
+        - "Authenticated: redirect to dashboard, set session token"
+        - "Locked: show CAPTCHA + email reset link"
+        - "Both are absorbing — 不會自動 transition 出"
+        - "Reset 機制：admin unlock or time-based unlock"
+    notes: |
+      終態的設計決定 — 通常 Locked state 要有 escape hatch（時間鎖、admin 解除、CAPTCHA 解除）。
+      Speaker notes 補充 security trade-off：太嚴 = UX 差、太鬆 = brute-force 漏洞。
+
+  # --- Frame 7: Recap ---
+  - id: recap
+    mode: image
+    image: ./assets/your-state-machine-diagram.svg
+    view: [0, 0, 1200, 800]   # 回 overview
+    dim: 0.5
+    overlay:
+      position: full
+      title: "Recap · Login Flow"
+      subtitle: "5 states · retry loop · 2 absorbing finals"
+      bullets:
+        - "Initial → AwaitingCredentials → Authenticating → Authenticated / Locked"
+        - "Retry guard: count < 3 protects against brute force"
+        - "Locked state needs escape (time / admin / CAPTCHA)"
+        - "Side effects 集中在 Authenticating（API call）"
+        - "→ Implementation: XState / React-State-Hooks / Redux-Saga"
+      footer: "Q&A · github.com/you/state-machine-talk"
+    notes: |
+      Recap 回到 overview，bullets 是 take-home points。
+      Footer 帶 contact / source code。
+
+# ============================================================
+# Variant: decision tree (DDx algorithm, clinical flowchart)
+# ============================================================
+# 把 state 換成 decision node / question / treatment option：
+#   - Frame 2: root question (e.g., "Patient stable?")
+#   - Frame 3: branch A (stable) → next decision
+#   - Frame 4: branch B (unstable) → ER protocol
+#   - ...
+# Caption-bottom + right panel 同樣可用。
+#
+# ============================================================
+# Variant: software UI flow / auth flow / payment flow
+# ============================================================
+# 跟 login flow 同 pattern，內容換掉。
+# 適合 vibe-coding 專案介紹的某個 sub-feature 解說。

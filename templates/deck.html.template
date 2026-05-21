@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="__THEME__">
+<head>
+<meta charset="utf-8">
+<title>__DOC_TITLE__</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel-bg: rgba(22,27,34,0.96);
+    --panel-border: rgba(88,166,255,0.5);
+    --text: #e6edf3;
+    --text-soft: #c9d1d9;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-soft: #79c0ff;
+    --green: #7ee787;
+    --red: #ff7b72;
+    --iframe-bg: #f4ebd0;
+    --pill-bg: rgba(34,34,34,0.88);
+    --pill-text: #f0ffff;
+    --border-soft: #21262d;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f8fa;
+    --panel-bg: rgba(255,255,255,0.97);
+    --panel-border: rgba(9,105,218,0.4);
+    --text: #1f2328;
+    --text-soft: #424a53;
+    --text-muted: #656d76;
+    --accent: #0969da;
+    --accent-soft: #218bff;
+    --green: #1a7f37;
+    --red: #cf222e;
+    --iframe-bg: #f4ebd0;
+    --pill-bg: rgba(36,41,47,0.92);
+    --pill-text: #ffffff;
+    --border-soft: #d0d7de;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang TC", "Helvetica Neue", sans-serif; overflow: hidden; }
+  #stage { position: fixed; inset: 0; overflow: hidden; background: var(--bg); }
+  .page-iframe { position: absolute; inset: 0; overflow: hidden;
+    opacity: 0; pointer-events: none; transition: opacity 350ms ease; }
+  .page-iframe[data-active] { opacity: 1; pointer-events: auto; }
+  .page-iframe iframe, .page-iframe img { position: absolute; left: 0; top: 0;
+    width: 100%; height: __IFRAME_H__px; border: 0;
+    background: var(--iframe-bg);
+    transform-origin: 0 0;
+    transition: transform 900ms cubic-bezier(.55,.05,.45,.95); }
+  .page-iframe img { object-fit: contain; height: auto; max-height: __IFRAME_H__px; }
+  .highlight { position: absolute; pointer-events: none; z-index: 6;
+    border: 3px solid var(--accent-soft); border-radius: 12px;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.65), 0 0 24px rgba(121,192,255,0.7);
+    opacity: 0;
+    transition: opacity 400ms ease, left 700ms cubic-bezier(.55,.05,.45,.95),
+                top 700ms cubic-bezier(.55,.05,.45,.95),
+                width 700ms cubic-bezier(.55,.05,.45,.95),
+                height 700ms cubic-bezier(.55,.05,.45,.95); }
+  :root[data-theme="light"] .highlight { box-shadow: 0 0 0 9999px rgba(255,255,255,0.55), 0 0 24px rgba(9,105,218,0.5); }
+  .highlight.show { opacity: 1; }
+  #dim { position: absolute; inset: 0; background: #000;
+    opacity: 0; transition: opacity 500ms ease; pointer-events: none; z-index: 5; }
+  :root[data-theme="light"] #dim { background: #fff; }
+
+  #overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+  .panel { position: absolute; background: var(--panel-bg);
+    border: 2px solid var(--panel-border);
+    border-radius: 16px; padding: 32px 40px; color: var(--text);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    opacity: 0; transform: translateY(8px); transition: opacity 400ms ease 150ms, transform 400ms ease 150ms; }
+  .panel.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .panel h2 { margin: 0 0 6px; font-size: 28px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.5px; }
+  .panel .sub { font-size: 16px; color: var(--accent-soft); margin-bottom: 18px; font-weight: 500; }
+  .panel ul { list-style: none; padding: 0; margin: 0; }
+  .panel li { font-size: 15px; line-height: 1.65; color: var(--text); padding: 5px 0;
+    padding-left: 22px; position: relative; }
+  .panel li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+  .panel.position-full { top: 50%; left: 50%; transform: translate(-50%, calc(-50% + 8px));
+    width: min(720px, 80vw); max-height: 80vh; overflow-y: auto; text-align: center; }
+  .panel.position-full.show { transform: translate(-50%, -50%); }
+  .panel.position-full h2 { font-size: 42px; }
+  .panel.position-full .sub { font-size: 20px; margin-bottom: 28px; }
+  .panel.position-full .tagline { font-size: 20px; color: var(--accent-soft); margin: 24px 0;
+    line-height: 1.5; }
+  .panel.position-full .footer { font-size: 13px; color: var(--text-muted);
+    font-family: ui-monospace, monospace; margin-top: 24px; }
+  .panel.position-full ul { text-align: left; max-width: 580px; margin: 0 auto; }
+  .panel.position-right { top: 50%; right: 40px; transform: translateY(calc(-50% + 8px));
+    width: 360px; max-height: 80vh; overflow-y: auto; }
+  .panel.position-right.show { transform: translateY(-50%); }
+  .panel.position-left { top: 50%; left: 40px; transform: translateY(calc(-50% + 8px));
+    width: 360px; max-height: 80vh; overflow-y: auto; }
+  .panel.position-left.show { transform: translateY(-50%); }
+  .panel.position-caption-bottom { left: 50%; bottom: 40px; transform: translateX(-50%) translateY(8px);
+    max-width: 80vw; padding: 18px 28px; text-align: center; }
+  .panel.position-caption-bottom.show { transform: translateX(-50%) translateY(0); }
+  .panel.position-caption-bottom h2 { font-size: 22px; margin-bottom: 4px; }
+  .panel.position-caption-bottom .sub { font-size: 14px; margin-bottom: 0; }
+  .panel.position-caption-top { left: 50%; top: 40px; transform: translateX(-50%) translateY(-8px);
+    max-width: 80vw; padding: 18px 28px; text-align: center; }
+  .panel.position-caption-top.show { transform: translateX(-50%) translateY(0); }
+
+  .counter-pill { position: fixed; top: 16px; left: 16px; z-index: 30;
+    background: var(--pill-bg); color: var(--pill-text); padding: 6px 14px;
+    border-radius: 999px; font-size: 13px; font-variant-numeric: tabular-nums;
+    backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08); }
+  #frame-list { position: fixed; top: 0; right: 0; bottom: 0; width: 380px;
+    background: var(--panel-bg);
+    border-left: 1px solid var(--border-soft); padding: 60px 0 0; z-index: 40;
+    transform: translateX(100%); transition: transform 250ms ease; overflow-y: auto; }
+  #frame-list.show { transform: translateX(0); }
+  #frame-list h3 { margin: 0 24px 16px; font-size: 13px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  #frame-list ol { list-style: none; padding: 0; margin: 0; counter-reset: f; }
+  #frame-list li { counter-increment: f; padding: 14px 24px; cursor: pointer;
+    border-top: 1px solid var(--border-soft); transition: background 150ms; }
+  #frame-list li:hover { background: rgba(88,166,255,0.1); }
+  #frame-list li.cur { background: rgba(88,166,255,0.2); border-left: 3px solid var(--accent); }
+  #frame-list li::before { content: counter(f) ". "; color: var(--text-muted);
+    font-variant-numeric: tabular-nums; }
+  #frame-list .li-title { font-size: 15px; color: var(--text); display: inline; font-weight: 500; }
+  #frame-list .li-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; padding-left: 22px; }
+  /* Hierarchy outline (libstored-inspired): title_level 1-4 indent + dot prefix */
+  #frame-list li[data-level="2"] { padding-left: 40px; }
+  #frame-list li[data-level="2"] .li-title { font-size: 14px; }
+  #frame-list li[data-level="2"]::before { content: ". . " counter(f) ". "; color: rgba(255,255,255,0.4); }
+  #frame-list li[data-level="3"] { padding-left: 56px; }
+  #frame-list li[data-level="3"] .li-title { font-size: 13px; color: var(--text-soft); }
+  #frame-list li[data-level="3"]::before { content: ". . . . " counter(f) ". "; color: rgba(255,255,255,0.3); }
+  #frame-list li[data-level="4"] { padding-left: 72px; }
+  #frame-list li[data-level="4"] .li-title { font-size: 12px; color: var(--text-muted); }
+  #frame-list li[data-level="4"]::before { content: ". . . . . . " counter(f) ". "; color: rgba(255,255,255,0.25); }
+  :root[data-theme="light"] #frame-list li[data-level="2"]::before { color: rgba(0,0,0,0.4); }
+  :root[data-theme="light"] #frame-list li[data-level="3"]::before { color: rgba(0,0,0,0.3); }
+  :root[data-theme="light"] #frame-list li[data-level="4"]::before { color: rgba(0,0,0,0.25); }
+  #blank { position: fixed; inset: 0; background: #000; z-index: 50;
+    opacity: 0; pointer-events: none; transition: opacity 200ms; }
+  #blank.show { opacity: 1; pointer-events: auto; }
+  #notes { position: fixed; bottom: 0; left: 0; right: 0; max-height: 38vh; overflow-y: auto;
+    background: var(--panel-bg);
+    border-top: 2px solid var(--accent); padding: 20px 28px; z-index: 35;
+    transform: translateY(100%); transition: transform 300ms ease; }
+  #notes.show { transform: translateY(0); }
+  #notes h3 { margin: 0 0 10px; font-size: 13px; color: var(--accent); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px; }
+  #notes p { margin: 0; font-size: 15px; line-height: 1.75; color: var(--text-soft); white-space: pre-wrap; }
+  #help { position: fixed; bottom: 12px; right: 16px; z-index: 28; font-size: 11px;
+    color: var(--text-muted); background: var(--panel-bg); padding: 8px 12px; border-radius: 6px;
+    line-height: 1.7; pointer-events: none; }
+  #help kbd { background: var(--border-soft); padding: 1px 5px; border-radius: 3px; color: var(--text);
+    font-family: ui-monospace, monospace; font-size: 10px; }
+
+  /* Calibration mode */
+  #cal-banner { position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+    background: var(--red); color: white; padding: 8px 18px; border-radius: 6px;
+    font-size: 13px; z-index: 100; display: none; box-shadow: 0 6px 20px rgba(255,123,114,0.4);
+    font-weight: 500; }
+  #cal-banner.show { display: block; }
+  .cal-drag-box { position: fixed; border: 2px dashed var(--accent-soft);
+    background: rgba(88,166,255,0.12); pointer-events: none; z-index: 99;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.25); }
+  #cal-result { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--panel-bg); border: 1px solid var(--accent); padding: 16px 24px; border-radius: 8px;
+    z-index: 101; display: none; box-shadow: 0 8px 32px rgba(0,0,0,0.7); min-width: 360px;
+    text-align: center; }
+  #cal-result.show { display: block; }
+  #cal-result .coords { font-family: ui-monospace, monospace; font-size: 15px;
+    color: var(--accent-soft); user-select: all; padding: 6px 10px; background: rgba(0,0,0,0.3);
+    border-radius: 4px; display: inline-block; }
+  #cal-result .hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  #cal-result .frame-id { font-size: 11px; color: var(--red); margin-bottom: 4px;
+    font-family: ui-monospace, monospace; }
+  #cal-log { position: fixed; top: 100px; left: 16px; width: 340px; max-height: 75vh;
+    overflow-y: auto; background: var(--panel-bg); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 12px; z-index: 100; display: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+  #cal-log.show { display: block; }
+  #cal-log .header { font-size: 11px; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 10px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; }
+  #cal-log .header .actions { font-size: 10px; color: var(--text-muted); text-transform: none;
+    letter-spacing: normal; }
+  #cal-log .header kbd { background: var(--border-soft); padding: 1px 5px; border-radius: 3px;
+    color: var(--text); font-family: ui-monospace, monospace; font-size: 10px; }
+  #cal-log .row { padding: 8px 10px; cursor: pointer; border-radius: 4px;
+    font-family: ui-monospace, monospace; font-size: 12px; color: var(--text-soft);
+    display: flex; gap: 8px; align-items: baseline; transition: background 100ms; }
+  #cal-log .row:hover { background: rgba(88,166,255,0.1); }
+  #cal-log .row.cur { background: rgba(255,123,114,0.18);
+    border-left: 3px solid var(--red); padding-left: 7px; }
+  #cal-log .row .idx { color: var(--text-muted); min-width: 28px; }
+  #cal-log .row .id { color: var(--text); flex: 0 0 80px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; }
+  #cal-log .row .coords { color: var(--green); font-size: 10px; flex: 1 1 auto;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #cal-log .row.has-data { background: rgba(126,231,135,0.06); }
+  #cal-log .row .empty { color: var(--text-muted); font-style: italic; font-size: 11px; }
+  #cal-log .row .preview-mark { color: var(--green); font-size: 14px; }
+  #cal-log .footer { font-size: 10px; color: var(--text-muted); margin-top: 10px;
+    padding-top: 8px; border-top: 1px solid var(--border-soft); line-height: 1.6; }
+  #cal-log .footer kbd { background: var(--border-soft); padding: 1px 5px; border-radius: 3px;
+    color: var(--text); font-family: ui-monospace, monospace; }
+
+  /* Presenter mode (P key toggle) */
+  #presenter-clock { position: fixed; top: 16px; right: 16px; z-index: 30;
+    background: var(--pill-bg); color: var(--pill-text); padding: 6px 14px;
+    border-radius: 8px; font-size: 13px; font-variant-numeric: tabular-nums;
+    backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.08);
+    display: none; font-family: ui-monospace, monospace; min-width: 165px; text-align: center; }
+  #presenter-clock .now { font-size: 15px; font-weight: 600; }
+  #presenter-clock .elapsed { font-size: 11px; color: var(--accent-soft); margin-top: 2px; }
+  body.presenter-mode #presenter-clock { display: block; }
+  #presenter-strip { position: fixed; left: 0; right: 0; bottom: 0; z-index: 36;
+    background: var(--panel-bg); border-top: 2px solid var(--accent);
+    padding: 10px 16px; display: none; gap: 12px; align-items: stretch;
+    backdrop-filter: blur(10px); box-shadow: 0 -8px 24px rgba(0,0,0,0.4); }
+  body.presenter-mode #presenter-strip { display: flex; }
+  body.presenter-mode #notes { transform: translateY(0); bottom: 90px;
+    max-height: 35vh; }   /* pin notes open above strip */
+  body.presenter-mode #help { display: none; }
+  #presenter-strip .ps-cell { flex: 1 1 0; padding: 8px 12px; border-radius: 6px;
+    background: rgba(0,0,0,0.2); border: 1px solid var(--border-soft);
+    display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+  #presenter-strip .ps-cell.cur { background: rgba(88,166,255,0.15);
+    border-color: var(--accent); transform: scale(1.02); }
+  #presenter-strip .ps-cell.empty { background: transparent; border-style: dashed;
+    color: var(--text-muted); justify-content: center; align-items: center;
+    font-style: italic; font-size: 12px; }
+  #presenter-strip .ps-label { font-size: 10px; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+    margin-bottom: 3px; }
+  #presenter-strip .ps-title { font-size: 14px; color: var(--text); font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #presenter-strip .ps-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.presenter-mode .counter-pill { background: var(--accent); color: white; }
+
+  /* Print / PDF mode (?print=1 or media print) */
+  @media print {
+    body { overflow: visible !important; }
+    #stage { position: static !important; }
+    .page-iframe, #dim, #overlay, #frame-list, #blank, #help, .counter-pill,
+    #cal-banner, #cal-result, #cal-log, .cal-drag-box { display: none !important; }
+    #notes { transform: none !important; position: static !important; max-height: none !important; }
+    .print-page { page-break-after: always; padding: 24px; }
+    .print-page h2 { font-size: 28px; margin-bottom: 4px; color: #000; }
+    .print-page .sub { font-size: 16px; color: #555; margin-bottom: 12px; }
+    .print-page ul li { font-size: 13px; line-height: 1.6; }
+    .print-page .notes { margin-top: 18px; padding: 12px;
+      background: #f5f5f5; border-left: 3px solid #58a6ff; font-size: 12px; line-height: 1.7;
+      white-space: pre-wrap; }
+  }
+  body.print-mode { overflow: visible; }
+  body.print-mode #stage, body.print-mode #dim, body.print-mode #overlay,
+  body.print-mode .counter-pill, body.print-mode #help, body.print-mode #frame-list,
+  body.print-mode #notes, body.print-mode #blank { display: none; }
+  body.print-mode #print-content { display: block; }
+  #print-content { display: none; background: white; color: black;
+    font-family: -apple-system, "PingFang TC", sans-serif; }
+  #print-content .print-page { padding: 24px; page-break-after: always;
+    border-bottom: 1px solid #ddd; min-height: 90vh; }
+  #print-content .print-page:last-child { page-break-after: auto; }
+  #print-content h2 { font-size: 28px; margin: 0 0 4px; color: #000; }
+  #print-content .sub { font-size: 16px; color: #555; margin-bottom: 12px; }
+  #print-content ul { padding-left: 22px; }
+  #print-content ul li { font-size: 14px; line-height: 1.65; margin-bottom: 4px; }
+  #print-content .notes-block { margin-top: 18px; padding: 14px;
+    background: #f5f7fa; border-left: 3px solid #0969da; font-size: 13px; line-height: 1.75;
+    white-space: pre-wrap; color: #2d3338; }
+  #print-content .frame-num { font-size: 12px; color: #888; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="dim"></div>
+<div id="overlay"></div>
+<div class="counter-pill">
+  <span id="frame-num">1</span> / <span id="frame-total">__N__</span>
+</div>
+<div id="frame-list"><h3>Frames</h3><ol id="frame-list-ol"></ol></div>
+<div id="blank"></div>
+<div id="notes"><h3 id="notes-title">Speaker Notes</h3><p id="notes-body"></p></div>
+<div id="help">
+  <kbd>→</kbd>/<kbd>Space</kbd> next · <kbd>←</kbd> prev<br>
+  <kbd>1</kbd>–<kbd>9</kbd> jump · <kbd>L</kbd> list<br>
+  <kbd>N</kbd> notes · <kbd>B</kbd> blank · <kbd>C</kbd> calibrate<br>
+  <kbd>P</kbd> presenter mode
+</div>
+<div id="presenter-clock"><div class="now">--:--:--</div><div class="elapsed">+00:00</div></div>
+<div id="presenter-strip">
+  <div class="ps-cell" id="ps-prev"><div class="ps-label">← prev</div><div class="ps-title"></div><div class="ps-sub"></div></div>
+  <div class="ps-cell cur" id="ps-cur"><div class="ps-label">current</div><div class="ps-title"></div><div class="ps-sub"></div></div>
+  <div class="ps-cell" id="ps-next"><div class="ps-label">next →</div><div class="ps-title"></div><div class="ps-sub"></div></div>
+</div>
+<div id="cal-banner">CAL MODE · 拖拉框 UI · <kbd>S</kbd> 匯出 · <kbd>X</kbd> 清空 · <kbd>Esc</kbd>/<kbd>C</kbd> 退出</div>
+<div id="cal-result"></div>
+<div id="cal-log"></div>
+<div id="print-content"></div>
+
+<script>
+const DECK = __DECK_JSON__;
+const IFRAME_REF_W = DECK.iframe_ref_w || __IFRAME_W__;
+const IFRAME_REF_H = DECK.iframe_ref_h || __IFRAME_H__;
+
+const stage = document.getElementById('stage');
+const overlay = document.getElementById('overlay');
+const dimEl = document.getElementById('dim');
+const counter = document.getElementById('frame-num');
+const listOl = document.getElementById('frame-list-ol');
+const listEl = document.getElementById('frame-list');
+const blankEl = document.getElementById('blank');
+const notesEl = document.getElementById('notes');
+const notesTitle = document.getElementById('notes-title');
+const notesBody = document.getElementById('notes-body');
+let cur = 0;
+
+// Build backgrounds (iframes for live pages, imgs for static images)
+const pageEls = {};
+const imageElsByFrameId = {};
+
+Object.entries(DECK.pages || {}).forEach(([key, url]) => {
+  const wrap = document.createElement('div');
+  wrap.className = 'page-iframe';
+  wrap.dataset.page = key;
+  const iframe = document.createElement('iframe');
+  iframe.src = url;
+  iframe.title = key;
+  wrap.appendChild(iframe);
+  const hl = document.createElement('div');
+  hl.className = 'highlight';
+  wrap.appendChild(hl);
+  stage.appendChild(wrap);
+  pageEls[key] = wrap;
+});
+
+DECK.frames.forEach(f => {
+  if (f.mode === 'image' && f.image_data_url) {
+    const wrap = document.createElement('div');
+    wrap.className = 'page-iframe';
+    wrap.dataset.imageFrame = f.id;
+    const img = document.createElement('img');
+    img.src = f.image_data_url;
+    img.alt = f.title || f.id;
+    wrap.appendChild(img);
+    const hl = document.createElement('div');
+    hl.className = 'highlight';
+    wrap.appendChild(hl);
+    stage.appendChild(wrap);
+    imageElsByFrameId[f.id] = wrap;
+  }
+});
+
+DECK.frames.forEach((f, i) => {
+  const li = document.createElement('li');
+  const lvl = f.title_level && f.title_level >= 1 && f.title_level <= 4 ? f.title_level : 1;
+  if (lvl > 1) li.dataset.level = String(lvl);
+  li.innerHTML = `<span class="li-title">${escapeHtml(f.overlay?.title || f.title || f.id)}</span>` +
+    (f.overlay?.subtitle || f.subtitle ? `<div class="li-sub">${escapeHtml(f.overlay?.subtitle || f.subtitle)}</div>` : '');
+  li.addEventListener('click', () => { goto(i); listEl.classList.remove('show'); });
+  listOl.appendChild(li);
+});
+document.getElementById('frame-total').textContent = DECK.frames.length;
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function getActiveBgEl(f) {
+  if (f.mode === 'iframe') return pageEls[f.page];
+  if (f.mode === 'image') return imageElsByFrameId[f.id];
+  return null;
+}
+
+function applyView(activeBgEl, view, showHighlight) {
+  if (!activeBgEl) return;
+  const inner = activeBgEl.querySelector('iframe, img');
+  const [x, y, w, h] = view;
+  if (inner) inner.style.transform = `translateY(${-y}px)`;
+  const vpW = window.innerWidth;
+  const ratio = vpW / IFRAME_REF_W;
+  const hl = activeBgEl.querySelector('.highlight');
+  if (hl) {
+    if (showHighlight) {
+      hl.style.left = (x * ratio) + 'px';
+      hl.style.top = '0px';
+      hl.style.width = (w * ratio) + 'px';
+      hl.style.height = (h * ratio) + 'px';
+      hl.classList.add('show');
+    } else {
+      hl.classList.remove('show');
+    }
+  }
+}
+
+function isFullView(view) {
+  const [x, y, w, h] = view;
+  return x === 0 && y === 0 && w >= IFRAME_REF_W && h >= (IFRAME_REF_H - 100);
+}
+
+function renderOverlay(o) {
+  overlay.innerHTML = '';
+  if (!o || o.position === 'none' || !o.position) return;
+  const panel = document.createElement('div');
+  panel.className = `panel position-${o.position}`;
+  if (o.title) {
+    const h2 = document.createElement('h2');
+    h2.textContent = o.title;
+    panel.appendChild(h2);
+  }
+  if (o.subtitle) {
+    const sub = document.createElement('div');
+    sub.className = 'sub';
+    sub.textContent = o.subtitle;
+    panel.appendChild(sub);
+  }
+  if (o.tagline) {
+    const t = document.createElement('div');
+    t.className = 'tagline';
+    t.textContent = o.tagline;
+    panel.appendChild(t);
+  }
+  if (o.bullets && o.bullets.length) {
+    const ul = document.createElement('ul');
+    o.bullets.forEach(b => {
+      const li = document.createElement('li');
+      li.textContent = b;
+      ul.appendChild(li);
+    });
+    panel.appendChild(ul);
+  }
+  if (o.footer) {
+    const ft = document.createElement('div');
+    ft.className = 'footer';
+    ft.textContent = o.footer;
+    panel.appendChild(ft);
+  }
+  overlay.appendChild(panel);
+  requestAnimationFrame(() => panel.classList.add('show'));
+}
+
+// ===== Calibration mode persistence =====
+const CAL_PREFIX = `cal:${DECK.id}:`;
+function calKey(f) { return CAL_PREFIX + f.id; }
+function loadCal(f) { const v = localStorage.getItem(calKey(f)); return v ? JSON.parse(v) : null; }
+function saveCal(f, view) { localStorage.setItem(calKey(f), JSON.stringify({ id: f.id, view, ts: Date.now() })); }
+function clearAllCal() {
+  Object.keys(localStorage).filter(k => k.startsWith(CAL_PREFIX)).forEach(k => localStorage.removeItem(k));
+}
+function effectiveView(f) {
+  const stored = loadCal(f);
+  return stored ? stored.view : f.view;
+}
+
+function goto(idx) {
+  if (idx < 0 || idx >= DECK.frames.length) return;
+  const f = DECK.frames[idx];
+  Object.values(pageEls).forEach(el => el.removeAttribute('data-active'));
+  Object.values(imageElsByFrameId).forEach(el => el.removeAttribute('data-active'));
+  const bg = getActiveBgEl(f);
+  if (bg) bg.dataset.active = '';
+  const liveView = effectiveView(f);
+  const showHighlight = !isFullView(liveView) && f.overlay?.position !== 'full' && f.mode !== 'text';
+  if (bg) applyView(bg, liveView, showHighlight);
+  dimEl.style.opacity = (f.dim ?? 0).toString();
+  renderOverlay(f.overlay);
+  cur = idx;
+  counter.textContent = idx + 1;
+  document.title = `${DECK.title} — ${f.overlay?.title || f.title || f.id}`;
+  notesTitle.textContent = `Notes — ${f.overlay?.title || f.title || f.id}`;
+  notesBody.textContent = f.notes || '(no notes)';
+  Array.from(listOl.children).forEach((li, i) => li.classList.toggle('cur', i === idx));
+}
+
+// ===== Calibration UI =====
+const calBanner = document.getElementById('cal-banner');
+const calResult = document.getElementById('cal-result');
+const calLog = document.getElementById('cal-log');
+let calibrating = false;
+let dragStart = null;
+let dragBox = null;
+let savedDim = null;
+
+function renderCalLog() {
+  calLog.innerHTML = '';
+  const header = document.createElement('div');
+  header.className = 'header';
+  const n = DECK.frames.filter(f => loadCal(f)).length;
+  header.innerHTML = `<span>Calibrations · ${n} / ${DECK.frames.length}</span>` +
+    `<span class="actions"><kbd>S</kbd> export · <kbd>X</kbd> clear</span>`;
+  calLog.appendChild(header);
+  DECK.frames.forEach((f, i) => {
+    const stored = loadCal(f);
+    const row = document.createElement('div');
+    row.className = 'row' + (i === cur ? ' cur' : '') + (stored ? ' has-data' : '');
+    const coords = stored ? `view(${stored.view.join(', ')})` : '<span class="empty">—</span>';
+    const mark = stored ? '<span class="preview-mark">●</span>' : '';
+    row.innerHTML = `<span class="idx">F${i+1}</span>` +
+      `<span class="id">${escapeHtml(f.id)}</span>` +
+      `<span class="coords">${coords}</span>${mark}`;
+    row.addEventListener('click', () => { goto(i); renderCalLog(); });
+    calLog.appendChild(row);
+  });
+  const footer = document.createElement('div');
+  footer.className = 'footer';
+  footer.innerHTML = `<kbd>C</kbd>/<kbd>Esc</kbd> 退出 · <kbd>S</kbd> 匯出 · <kbd>X</kbd> 清空 · 點列跳 frame`;
+  calLog.appendChild(footer);
+}
+
+function exportCalibrations() {
+  const lines = ['# === Calibration export ==='];
+  DECK.frames.forEach((f, i) => {
+    const stored = loadCal(f);
+    if (!stored) return;
+    lines.push(`# Frame ${i+1} · ${f.id}`);
+    lines.push(`view: [${stored.view.join(', ')}]   # paste into YAML config under this frame`);
+  });
+  const text = lines.join('\n');
+  navigator.clipboard?.writeText(text).then(() => {
+    calResult.innerHTML = `<div class="frame-id">EXPORT</div>` +
+      `<div class="coords">${DECK.frames.filter(f => loadCal(f)).length} 個校正結果已複製</div>` +
+      `<div class="hint">貼進 YAML config 的 view 欄位</div>`;
+    calResult.classList.add('show');
+    setTimeout(() => calResult.classList.remove('show'), 5000);
+  });
+  console.log('=== CAL EXPORT ===\n' + text);
+}
+
+function enterCal() {
+  calibrating = true;
+  document.body.style.cursor = 'crosshair';
+  calBanner.classList.add('show');
+  calLog.classList.add('show');
+  renderCalLog();
+  savedDim = dimEl.style.opacity;
+  dimEl.style.opacity = '0';
+  document.querySelectorAll('.page-iframe').forEach(el => el.style.pointerEvents = 'none');
+}
+function exitCal() {
+  calibrating = false;
+  document.body.style.cursor = '';
+  calBanner.classList.remove('show');
+  calLog.classList.remove('show');
+  if (savedDim !== null) dimEl.style.opacity = savedDim;
+  document.querySelectorAll('.page-iframe').forEach(el => el.style.pointerEvents = '');
+  if (dragBox) { dragBox.remove(); dragBox = null; }
+  dragStart = null;
+}
+
+document.addEventListener('mousedown', e => {
+  if (!calibrating) return;
+  e.preventDefault();
+  dragStart = [e.clientX, e.clientY];
+  if (dragBox) dragBox.remove();
+  dragBox = document.createElement('div');
+  dragBox.className = 'cal-drag-box';
+  Object.assign(dragBox.style, { left: e.clientX+'px', top: e.clientY+'px', width: '0px', height: '0px' });
+  document.body.appendChild(dragBox);
+});
+document.addEventListener('mousemove', e => {
+  if (!calibrating || !dragStart) return;
+  const [sx, sy] = dragStart;
+  const x = Math.min(sx, e.clientX), y = Math.min(sy, e.clientY);
+  const w = Math.abs(e.clientX - sx), h = Math.abs(e.clientY - sy);
+  Object.assign(dragBox.style, { left: x+'px', top: y+'px', width: w+'px', height: h+'px' });
+});
+document.addEventListener('mouseup', e => {
+  if (!calibrating || !dragStart) return;
+  const [sx, sy] = dragStart;
+  dragStart = null;
+  const dragW = Math.abs(e.clientX - sx);
+  const dragH = Math.abs(e.clientY - sy);
+  if (dragW < 8 || dragH < 8) { if (dragBox) { dragBox.remove(); dragBox = null; } return; }
+  const ratio = window.innerWidth / IFRAME_REF_W;
+  const f = DECK.frames[cur];
+  const curView = effectiveView(f);
+  const pan_y = curView ? curView[1] : 0;
+  const ix = Math.round(Math.min(sx, e.clientX) / ratio);
+  const iy = Math.round(Math.min(sy, e.clientY) / ratio + pan_y);
+  const iw = Math.round(dragW / ratio);
+  const ih = Math.round(dragH / ratio);
+  const newView = [ix, iy, iw, ih];
+  saveCal(f, newView);
+  const coords = `view(${ix}, ${iy}, ${iw}, ${ih})`;
+  calResult.innerHTML = `<div class="frame-id">frame ${cur+1} · ${f.id} · SAVED</div>` +
+    `<div class="coords">${coords}</div>` +
+    `<div class="hint">localStorage 已存 · 即時 highlight 預覽</div>`;
+  calResult.classList.add('show');
+  navigator.clipboard?.writeText(coords).catch(()=>{});
+  setTimeout(() => calResult.classList.remove('show'), 4500);
+  renderCalLog();
+  const bg = getActiveBgEl(f);
+  if (bg) applyView(bg, newView, true);
+});
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'IFRAME') return;
+  if (e.key === 'c' || e.key === 'C') {
+    if (calibrating) exitCal(); else enterCal();
+    return;
+  }
+  if (calibrating) {
+    if (e.key === 'Escape') exitCal();
+    else if (e.key === 's' || e.key === 'S') exportCalibrations();
+    else if (e.key === 'x' || e.key === 'X') {
+      if (confirm('清空所有 calibration 結果？')) {
+        clearAllCal();
+        renderCalLog();
+        goto(cur);
+      }
+    }
+    else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goto(cur + 1); renderCalLog(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goto(cur - 1); renderCalLog(); }
+    else if (/^[1-9]$/.test(e.key)) {
+      const n = parseInt(e.key, 10) - 1;
+      if (n < DECK.frames.length) { goto(n); renderCalLog(); }
+    }
+    return;
+  }
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goto(cur + 1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); goto(cur - 1); }
+  else if (e.key === 'l' || e.key === 'L') { listEl.classList.toggle('show'); }
+  else if (e.key === 'n' || e.key === 'N') { notesEl.classList.toggle('show'); }
+  else if (e.key === 'b' || e.key === 'B') { blankEl.classList.toggle('show'); }
+  else if (e.key === 'p' || e.key === 'P') { togglePresenter(); }
+  else if (e.key === '0') { goto(0); }
+  else if (/^[1-9]$/.test(e.key)) {
+    const n = parseInt(e.key, 10) - 1;
+    if (n < DECK.frames.length) goto(n);
+  } else if (e.key === 'Escape') {
+    listEl.classList.remove('show');
+    notesEl.classList.remove('show');
+    blankEl.classList.remove('show');
+  }
+});
+
+blankEl.addEventListener('click', () => blankEl.classList.remove('show'));
+window.addEventListener('resize', () => goto(cur));
+
+// ===== Presenter mode =====
+let presenterMode = false;
+let presenterStartTs = null;
+let presenterTimerId = null;
+const psPrev = document.getElementById('ps-prev');
+const psCur = document.getElementById('ps-cur');
+const psNext = document.getElementById('ps-next');
+const psClock = document.getElementById('presenter-clock');
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function updatePresenterClock() {
+  const d = new Date();
+  psClock.querySelector('.now').textContent = `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+  if (presenterStartTs) {
+    const sec = Math.floor((Date.now() - presenterStartTs) / 1000);
+    const mm = Math.floor(sec / 60), ss = sec % 60;
+    psClock.querySelector('.elapsed').textContent = `+${pad2(mm)}:${pad2(ss)}`;
+  }
+}
+
+function fillPresenterCell(cell, idx) {
+  const titleEl = cell.querySelector('.ps-title');
+  const subEl = cell.querySelector('.ps-sub');
+  if (idx < 0 || idx >= DECK.frames.length) {
+    cell.classList.add('empty');
+    titleEl.textContent = '';
+    subEl.textContent = '— end —';
+    return;
+  }
+  cell.classList.remove('empty');
+  const f = DECK.frames[idx];
+  titleEl.textContent = `${idx+1}. ${f.overlay?.title || f.title || f.id}`;
+  subEl.textContent = f.overlay?.subtitle || f.subtitle || '';
+}
+
+function updatePresenterStrip() {
+  if (!presenterMode) return;
+  fillPresenterCell(psPrev, cur - 1);
+  fillPresenterCell(psCur, cur);
+  fillPresenterCell(psNext, cur + 1);
+}
+
+function togglePresenter() {
+  presenterMode = !presenterMode;
+  document.body.classList.toggle('presenter-mode', presenterMode);
+  if (presenterMode) {
+    if (!presenterStartTs) presenterStartTs = Date.now();
+    updatePresenterClock();
+    updatePresenterStrip();
+    notesEl.classList.add('show');   // auto-open notes
+    if (!presenterTimerId) presenterTimerId = setInterval(updatePresenterClock, 1000);
+  } else {
+    notesEl.classList.remove('show');
+    if (presenterTimerId) { clearInterval(presenterTimerId); presenterTimerId = null; }
+  }
+}
+
+// Hook into goto() to refresh presenter strip
+const _origGoto = goto;
+goto = function(idx) {
+  _origGoto(idx);
+  if (presenterMode) updatePresenterStrip();
+};
+
+// Print mode: ?print=1 → render all frames as static pages, hide deck UI
+if (new URLSearchParams(location.search).get('print') === '1') {
+  document.body.classList.add('print-mode');
+  const pc = document.getElementById('print-content');
+  DECK.frames.forEach((f, i) => {
+    const page = document.createElement('div');
+    page.className = 'print-page';
+    const o = f.overlay || {};
+    let html = `<div class="frame-num">Frame ${i+1} / ${DECK.frames.length} · ${escapeHtml(f.id)}</div>`;
+    html += `<h2>${escapeHtml(o.title || f.title || f.id)}</h2>`;
+    if (o.subtitle || f.subtitle) html += `<div class="sub">${escapeHtml(o.subtitle || f.subtitle)}</div>`;
+    if (o.tagline) html += `<div>${escapeHtml(o.tagline)}</div>`;
+    if (o.bullets?.length) {
+      html += '<ul>' + o.bullets.map(b => `<li>${escapeHtml(b)}</li>`).join('') + '</ul>';
+    }
+    if (o.footer) html += `<div style="color:#888; font-family:monospace; margin-top:8px;">${escapeHtml(o.footer)}</div>`;
+    if (f.notes) html += `<div class="notes-block"><b>Speaker Notes:</b>\n${escapeHtml(f.notes)}</div>`;
+    page.innerHTML = html;
+    pc.appendChild(page);
+  });
+} else {
+  goto(0);
+}
+</script>
+</body>
+</html>

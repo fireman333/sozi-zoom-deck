@@ -1,0 +1,110 @@
+# sozi-zoom-deck · anatomy preset
+# Anatomy / diagram zoom annotation deck.
+# Single image background + multiple zoom regions + medical jargon styling.
+# Replace IMAGE_PATH with your actual image (relative to this file's dir).
+
+id: anatomy-example
+title: "Septal Myectomy"
+subtitle: "心室中膈切除術"
+iframe_ref_w: 406  # natural width of your anatomy image (in image pixels)
+iframe_ref_h: 264  # natural height
+# (Above are used as ref for view coord scaling. Use your image's actual px dimensions.)
+
+frames:
+  - id: cover
+    mode: image
+    image: ./assets/your-anatomy-image.jpg   # required for image mode
+    image_natural: [406, 264]
+    view: [0, 0, 406, 264]   # full image (overview)
+    dim: 0.5
+    overlay:
+      position: full
+      title: "Septal Myectomy"
+      subtitle: "外科治療 obstructive HCM"
+      tagline: "切除 hypertrophied septum，解除 LVOT obstruction"
+      footer: "Mayo Clinic · 1960s Morrow procedure"
+    notes: |
+      Cover frame：背景圖暗 50%，標題置中。
+      Septal myectomy 是 obstructive HCM 的 gold-standard surgical therapy。
+      1960 年代 Mayo Clinic 的 Andrew Glenn Morrow 開創。
+
+  - id: indication
+    mode: image
+    image: ./assets/your-anatomy-image.jpg
+    view: [0, 0, 406, 264]   # full image
+    dim: 0.65
+    overlay:
+      position: full
+      title: "Indication"
+      subtitle: "什麼樣的病人需要？"
+      bullets:
+        - "HOCM with resting/provoked LVOT gradient ≥ 50 mmHg"
+        - "NYHA Fc III-IV refractory to medical Tx"
+        - "Septal thickness ≥ 16 mm at basal anterior segment"
+        - "Alternative: alcohol septal ablation (ASA)"
+    notes: |
+      Class I indication (2024 AHA/ACC HCM guideline).
+
+  - id: transaortic
+    mode: image
+    image: ./assets/your-anatomy-image.jpg
+    view: [225, 25, 175, 155]   # zoom to top-right (transaortic arrow + aortic root)
+    dim: 0
+    overlay:
+      position: right
+      title: "Approach 1 — Transaortic (Morrow)"
+      subtitle: "經主動脈"
+      bullets:
+        - "Gold standard - >90% septal myectomy 走這條"
+        - "Sternotomy → aortotomy → 經 aortic valve 切 basal septum"
+        - "Working depth ~3 cm (limited by AV annulus)"
+        - "適合 obstruction 限於 basal segment"
+    notes: |
+      Transaortic approach (Morrow 1960). 預設首選。優點：避免 ventriculotomy。
+
+  - id: transventricular
+    mode: image
+    image: ./assets/your-anatomy-image.jpg
+    view: [0, 130, 230, 134]   # zoom to bottom-left (transventricular arrow + apex)
+    dim: 0
+    overlay:
+      position: right
+      title: "Approach 2 — Transventricular"
+      subtitle: "經心室 / 心尖"
+      bullets:
+        - "經 LV apex 切開"
+        - "適應症：mid-cavity / apical obstruction"
+        - "完整視野，但傷 LV myocardium"
+        - "Reserved for transaortic 無法 reach 的解剖"
+    notes: |
+      Transapical / transventricular approach. By Said/Schaff 2012 JTCVS.
+
+  - id: resection-target
+    mode: image
+    image: ./assets/your-anatomy-image.jpg
+    view: [120, 95, 170, 115]   # zoom to dashed-line resection region
+    dim: 0
+    overlay:
+      position: caption-bottom
+      title: "Resection Target — 5-10 g basal septum"
+      subtitle: "切太深 → VSD / AV block · 切不夠 → residual obstruction"
+    notes: |
+      切除範圍是手術成敗關鍵。Intraoperative TEE 必備。
+
+  - id: outcomes
+    mode: image
+    image: ./assets/your-anatomy-image.jpg
+    view: [0, 0, 406, 264]   # full image back
+    dim: 0.65
+    overlay:
+      position: full
+      title: "Outcome & Recap"
+      subtitle: "Mayo / Cleveland Clinic 數據"
+      bullets:
+        - "30-day mortality ≤ 1% (high-volume centers)"
+        - "10-year survival ~85%"
+        - ">90% NYHA Fc 改善至 I-II"
+        - "LVOT gradient relief durable >15 years"
+        - "Refer to ≥ 50 cases/yr center"
+    notes: |
+      Volume-outcome relationship 明確。台灣本土：台大、台中榮總、林口長庚。

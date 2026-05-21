@@ -1,0 +1,78 @@
+# sozi-zoom-deck · generic preset
+# Blank scaffold for any new zoom deck. Edit each frame.
+
+id: my-deck
+title: "Deck Title"
+subtitle: "Deck subtitle"
+iframe_ref_w: 1440
+iframe_ref_h: 1600
+
+# Optional: define live URLs for iframe-mode frames
+# pages:
+#   home: "https://example.com/"
+
+frames:
+  - id: cover
+    mode: text
+    overlay:
+      position: full
+      title: "Deck Title"
+      subtitle: "Subtitle"
+      tagline: "Tagline / one-liner"
+      footer: "footer text"
+    notes: |
+      Cover frame notes.
+
+  - id: section1
+    mode: text
+    overlay:
+      position: full
+      title: "Section 1"
+      subtitle: "What this section covers"
+      bullets:
+        - "Point 1"
+        - "Point 2"
+        - "Point 3"
+    notes: |
+      Section 1 notes.
+
+  # Image mode example (uncomment + supply image)
+  # - id: anatomy-zoom
+  #   mode: image
+  #   image: ./assets/diagram.jpg
+  #   image_natural: [1200, 800]
+  #   view: [400, 200, 400, 300]   # zoom into a region of the image
+  #   dim: 0
+  #   overlay:
+  #     position: caption-bottom
+  #     title: "Zoom on detail"
+  #     subtitle: "What this region shows"
+  #   notes: ""
+
+  # Iframe mode example (uncomment + supply pages.<key>)
+  # - id: live-demo
+  #   mode: iframe
+  #   page: home
+  #   view: [0, 0, 1440, 1600]
+  #   dim: 0.15
+  #   overlay:
+  #     position: right
+  #     title: "Live demo"
+  #     subtitle: "Walk through the UI"
+  #     bullets:
+  #       - "Feature A"
+  #       - "Feature B"
+  #   notes: ""
+
+  - id: recap
+    mode: text
+    overlay:
+      position: full
+      title: "Recap"
+      subtitle: "Wrap-up"
+      bullets:
+        - "Takeaway 1"
+        - "Takeaway 2"
+        - "Try it: <link or instruction>"
+    notes: |
+      Recap notes.
